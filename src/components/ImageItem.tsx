@@ -13,7 +13,7 @@ const ImgPreview = styled.img`
   background: #a70f11;
 `;
 
-const ImagesItem = (props : ImageItemProps) => {
+const ImageItem = (props : ImageItemProps) => {
     const dispatch = useAppDispatch();
     const selections = useAppSelector(state => state.selections).rows.find((selectionInRow) => selectionInRow.row == props.rowNumber);
 
@@ -38,4 +38,4 @@ export interface ImageItemProps {
     onEdit: ()=>void;
     onRemove: ()=>void;
 };
-export default ImagesItem;
+export default ImageItem;

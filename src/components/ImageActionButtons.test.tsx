@@ -141,3 +141,51 @@ describe('ImageActionButtons Describe Unit Test', () => {
     });
 
 });
+
+describe('ImageActionButton Describe Unit Test2', () => {
+    // Test Target Container 
+    let testImageActionButtonsProops3: ImageActionButtonsProps = {
+        onEdit: ()=>{},
+        onRemove: ()=>{}
+    };
+    // 테스트 단위별 DOM 엘리먼트를 매번 초기화 
+    beforeEach(() => {
+        const handleClick = jest.fn();
+        testImageActionButtonsProops3 = {
+            onEdit: handleClick,
+            onRemove: handleClick,
+        };
+    });
+
+    // ImageActionButton Render Test - 1
+    // 렌더링 이후 버튼(Edit, Delete) 그려졌는지 확인 
+    it('render excpected Edit and Delete ', ()=> {
+        // 
+        act(() => {
+            render(<ImageActionButtons {...testImageActionButtonsProops3} />);
+        });
+
+        // 
+        let editButton = screen.getByLabelText('Edit');
+        // console.dir(editButton);
+        
+        // error
+        // expect(editButton).toBe(/Edit/i); // error : <button .. 
+        // expect(editButton).toBe(/Edit/i);
+        // expect(editButton).toHaveTextContent(/Edit/i);
+        // expect(editButton).toHaveAttribute('aria-label', /Edit/i);
+
+        expect(editButton).toBeInTheDocument(); 
+        expect(editButton.nodeName).toBe('BUTTON');
+        expect(editButton).toHaveAttribute('aria-label', 'Edit');
+
+        // 
+        let deleteButton = screen.getByLabelText('Delete');
+        // 
+        expect(deleteButton).toBeInTheDocument(); 
+        expect(deleteButton.nodeName).toBe('BUTTON');
+        expect(deleteButton).toHaveAttribute('aria-label', 'Delete');
+
+    })
+
+});
