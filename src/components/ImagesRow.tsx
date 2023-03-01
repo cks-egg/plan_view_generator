@@ -95,7 +95,7 @@ const ImageRow = (props : RowProps) => {
         <DivFlex>
             {files.length > 0 && files.map((file: ImageFile) => {
                 return (
-                    <ImageItem rowNumber={props.rowNumber} key={file.id} id={file.id} url={file.url}/>
+                    <ImageItem rowNumber={props.rowNumber} key={file.id} id={file.id} url={file.url} onRemove={handleRemoveFiles} onEdit={handleEditFile} />
                 );
             })}
             <ImageAppender rowNumber={props.rowNumber} onChangeFiles={onChangeFiles} onRemove={handleRemoveFiles} onEdit={handleEditFile} />
