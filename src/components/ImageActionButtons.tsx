@@ -47,9 +47,22 @@ const ImageActionButtons = (props: ImageActionButtonsProps) => {
 
   return (
       <DivFab>
+        <input
+                type="file"
+                id="editFileUpload"
+                aria-label="editFileUpload"
+                style={{ display: "none" }}
+                multiple={true}
+                onChange={props.onChangeFiles}
+            />
         {fabs.map((fab, index) => (
             <Fab key={fab.label} aria-label={fab.label} color={fab.color} onClick={fab.onClick} >
+             { fab.label === 'Edit' ? 
+              <label htmlFor="editFileUpload">
                 {fab.icon}
+              </label>
+              : fab.icon  
+              }
             </Fab>
         ))}
       </DivFab>
@@ -60,5 +73,6 @@ export interface ImageActionButtonsProps  {
   // rowNumber: number,
   onEdit: () => void;
   onRemove: ()=> void;
+  onChangeFiles: (e: any) => void;
 }
 export default ImageActionButtons;

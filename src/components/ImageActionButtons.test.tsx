@@ -10,12 +10,14 @@ const testProps: ImageItemProps = {
     id: 0,
     url: "blob:http://localhost:3000/6e1068f1-3d27-4443-b713-e78eba4ecb02",
     onEdit: function(){},
-    onRemove: function(){}
+    onRemove: function(){},
+    onChangeFiles: (e)=>{}
 };
 
 const testImageActionButtonsProops: ImageActionButtonsProps = {
     onEdit: function(){window.alert('Alert-Edit');},
     onRemove: function(){window.alert('Alert-Delete');},
+    onChangeFiles: (e) => {}
 };
 
 
@@ -108,6 +110,7 @@ describe('ImageActionButtons Describe Unit Test', () => {
         const testImageActionButtonsProops2: ImageActionButtonsProps = {
             onEdit: handleClick,
             onRemove: handleClick,
+            onChangeFiles: (e) => {}
         };
 
         render(<ImageActionButtons {...testImageActionButtonsProops2} />);
@@ -146,7 +149,8 @@ describe('ImageActionButton Describe Unit Test2', () => {
     // Test Target Container 
     let testImageActionButtonsProops3: ImageActionButtonsProps = {
         onEdit: ()=>{},
-        onRemove: ()=>{}
+        onRemove: ()=>{},
+        onChangeFiles: (e) => {}
     };
     // 테스트 단위별 DOM 엘리먼트를 매번 초기화 
     beforeEach(() => {
@@ -154,6 +158,7 @@ describe('ImageActionButton Describe Unit Test2', () => {
         testImageActionButtonsProops3 = {
             onEdit: handleClick,
             onRemove: handleClick,
+            onChangeFiles: (e) => {}
         };
     });
 
@@ -168,7 +173,7 @@ describe('ImageActionButton Describe Unit Test2', () => {
         // 
         let editButton = screen.getByLabelText('Edit');
         // console.dir(editButton);
-        
+
         // error
         // expect(editButton).toBe(/Edit/i); // error : <button .. 
         // expect(editButton).toBe(/Edit/i);

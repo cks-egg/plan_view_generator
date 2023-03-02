@@ -24,7 +24,7 @@ const ImageItem = (props : ImageItemProps) => {
         <div>
             <ImgPreview src={props.url} onClick={handleImgClick} />
             {selections && selections.idList.length == 1 && selections.idList[0] == props.id ?
-                <ImageActionButtons onEdit={props.onEdit} onRemove={props.onRemove} />
+                <ImageActionButtons onEdit={props.onEdit} onRemove={props.onRemove} onChangeFiles={props.onChangeFiles} />
                 : ''
             }
         </div>
@@ -37,5 +37,6 @@ export interface ImageItemProps {
     url: string,
     onEdit: ()=>void;
     onRemove: ()=>void;
+    onChangeFiles: (e: any) => void;
 };
 export default ImageItem;

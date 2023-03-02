@@ -1,4 +1,5 @@
-import { act, fireEvent, render , screen} from '@testing-library/react';
+import { act, fireEvent, getByLabelText, render , screen} from '@testing-library/react';
+import { ChangeEvent } from 'react';
 import { Provider } from 'react-redux';
 import { clear, select, SelectionInRow } from '../app/slices/selections';
 import store from '../app/store';
@@ -14,10 +15,17 @@ describe('ImageItem Test Describe 1', () => {
     let testImageItemProps:ImageItemProps = {
         rowNumber: 0, 
         id: 0,
-        url: 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fdemo.ycart.kr%2Fshopboth_farm_max5_001%2Fbbs%2Fview_image.php%3Ffn%3Dhttp%253A%252F%252Fdemo.ycart.kr%252Fshopboth_cosmetics_001%252Fdata%252Feditor%252F1612%252Fcd2f39a0598c81712450b871c218164f_1482469221_493.jpg&psig=AOvVaw11qRQsmuLzrO0-Gk9mwTz0&ust=1677771592132000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCKj766-Iu_0CFQAAAAAdAAAAABAE',
+        url: 'hello1.png',
         onEdit: ()=>{},
-        onRemove: ()=>{}
+        onRemove: ()=>{},
+        onChangeFiles: (e) => {}
     };
+
+    let files: ImageFile[] = [
+        {id:0, file: new File(["img0"], "hello1.png", { type: "image/png" }), url: 'hello0.png'},
+        {id:1, file: new File(["img1"], "hello1.png", { type: "image/png" }), url: 'hello1.png'},
+        {id:2, file: new File(["img2"], "hello1.png", { type: "image/png" }), url: 'hello2.png'}
+    ];
 
     // Test Unit 별로 사용하기 위하여 선언
     let selections: SelectionInRow | null | undefined = null;
@@ -43,19 +51,77 @@ describe('ImageItem Test Describe 1', () => {
         return store.getState().selections.rows.find((x) => x.row == testImageItemProps.rowNumber);
     }
 
+    type ImageFile = {
+        id: number;
+        file: File;
+        url: string;
+    };
+
+    async function editAction(e: HTMLInputElement ) {
+        console.log('editAction');
+        console.dir(files);
+        // console.log(e.type);
+        // console.log(e.files);
+        // console.dir(e);
+        // 현재 file 배열에서 id 맥스값 찾기
+        let maxIdItem = Math.max(...files.map(o => o.id)); 
+        console.log(`maxIdItem : ${maxIdItem}`);
+        let fileId =  maxIdItem + 1;
+        let selectFiles: File[] = [];
+        let tempFiles: ImageFile[] = files;
+        let fileUploadId = e.id;
+        // console.log(`file id : ${fileUploadId}`);
+
+        if (e.type === "drop") {
+            // @ts-ignore
+            selectFiles = e.files;
+        } else {
+            // @ts-ignore
+            selectFiles = e.files;
+        }
+
+        if(fileUploadId === 'fileUpload'){
+            for (const file of selectFiles) {
+                tempFiles = [
+                    ...tempFiles,
+                    {id: fileId++, file: file, url: URL.createObjectURL(file) }
+                ];
+            }
+        } else if(fileUploadId === 'editFileUpload'){
+            let tempFileId = selections!.idList[0];
+            let filesIdx = files.findIndex((x) => x.id === tempFileId);
+
+            // setFiles(files.filter((curFile: ImageFile) => selections!.idList.indexOf(curFile.id) < 0));
+            // files = files.filter((curFile: ImageFile) => selections!.idList.indexOf(curFile.id) < 0);
+            await act(() => {
+                store.dispatch(clear(testImageItemProps.rowNumber));
+                // tempFiles[filesIdx] = {id: fileId++, file: selectFiles[0], url: URL.createObjectURL(selectFiles[0]) };
+                tempFiles[filesIdx] = {id: fileId++, file: selectFiles[0], url: selectFiles[0].name };
+                files = tempFiles;
+                store.dispatch(select({row: testImageItemProps.rowNumber, id:tempFiles[filesIdx].id}));
+            });
+            console.dir(files);
+        }
+
+        return store.getState().selections.rows.find((x) => x.row == testImageItemProps.rowNumber);
+    }
+
     // edit 이벤트핸들러 jest 목업 함수 
-    const handleOnEdit = jest.fn();
+    const handleOnEditMock = jest.fn();
     // delete 이벤트핸들러 jest 목업 함수 
-    const handleOnRemove = jest.fn();
+    const handleOnRemoveMock = jest.fn();
+    // file chang 발생 시 콜백 함수 
+    const onChangeFilesMock = jest.fn();
 
     // Test Unit 별로 실행전 초기값 설정 
     beforeEach(async () => {
         testImageItemProps =  {
                                 rowNumber: 0, 
                                 id: 0,
-                                url: '',
-                                onEdit: handleOnEdit,
-                                onRemove: handleOnRemove
+                                url: '123',
+                                onEdit: handleOnEditMock,
+                                onRemove: handleOnRemoveMock,
+                                onChangeFiles: onChangeFilesMock
                             };
         selections = await selectAction();
 
@@ -67,8 +133,8 @@ describe('ImageItem Test Describe 1', () => {
     // Test Unit 별로 실행후 초기화 
     afterEach(async () => {
         selections = null;
-        handleOnEdit.mockClear();
-        handleOnRemove.mockClear();
+        handleOnEditMock.mockClear();
+        handleOnRemoveMock.mockClear();
     });
 
 
@@ -182,7 +248,7 @@ describe('ImageItem Test Describe 1', () => {
         // error
         // expect(idListLength).toBe(0);
         // Delete 버튼의 onclick 이벤트 발생으로 handleOnRemove 핸들러가 1번 콜 발생 
-        expect(handleOnRemove).toBeCalledTimes(1);
+        expect(handleOnRemoveMock).toBeCalledTimes(1);
         // 실제 selections idList 에서 삭제 
         selections =  await deleteAction();
         // 삭제 확인 
@@ -194,5 +260,50 @@ describe('ImageItem Test Describe 1', () => {
         console.log('End - Test Unit3');
     });
 
+    // 실행전 작업 
+    //  1 - render <ImageItem />
+    //  2 - store selections 선택
+    // T-3. Edit 핸들메서드 동작 후 
+    //      - fileupload 
+    //      - 선택한 id 가 삭제되고 새로운 id 추가 
+    //      - DOM 새로운 img 확인 
+    it('Test Unit 4 - Button Actions Edit', async () => {
+        console.log('Start - Test Unit4');
+        const testImageFile = new File(["hello"], "hello.png", { type: "image/png" });
+
+        console.log(selections);
+        // let imageItemNode = document.querySelector('img');
+        // T-3. Edit 핸들메서드 동작 후 
+        //  - 화면으로부터 Edit 버튼 가져오기 
+        let editButtonNode = document.querySelector("button[aria-label='Edit']");
+        // console.dir(editButtonNode);
+        // screen.getByLabelText(/Edit/i);
+        //  - Edit 버튼의 클릭 이벤트 발생
+        fireEvent.click(editButtonNode!);
+        //  - 클릭 이벤트 발생으로 onEdit 콜백 실행
+        expect(handleOnEditMock).toBeCalledTimes(0);
+        // expect(handleOnRemove).toBeCalledTimes(0);
+
+        // input file 화면에서 가져오기 
+        // let fileUploadNode = screen.getByLabelText(/editFileUpload/) as HTMLInputElement;
+        let fileUploadNode = document.querySelector("input[id='editFileUpload']") as HTMLInputElement;
+        expect(fileUploadNode).toBeInTheDocument();
+        // file change 이벤트 발생 
+        console.log(fileUploadNode.files);
+        fireEvent.change(fileUploadNode!, { target: { files: [testImageFile] } });
+        console.log(fileUploadNode.files![0].name);
+        expect(fileUploadNode.files?.length).toBe(1);
+        // onchange 호출 확인 
+        expect(onChangeFilesMock).toBeCalledTimes(1);
+        // 현재 선택된 idList = [0] 이므로 id 값이 변경되었는지 확인 
+        selections =  await editAction(fileUploadNode);
+        // 현재 files 에 최대 id 값은 2 이므로 변경된 id 값은 3 
+        expect(selections?.idList[0]).toBe(3);
+        console.log(selections);
+                
+        console.log('End - Test Unit4');
+    });
+
 
 });
+
