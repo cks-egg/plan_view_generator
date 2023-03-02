@@ -77,13 +77,13 @@ const ImageAppender = (props: ImageAppenderProps) => {
             > +
             </LabelAppendImage>
 
-            <DivFab>
+            {/* <DivFab>
                 {selections && selections.idList.length > 0 ? fabs.map((fab, index) => (
                     <Fab key={fab.label} aria-label={fab.label} color={fab.color} onClick={fab.onClick} >
                         {fab.icon}
                     </Fab>
                 )) : ''}
-            </DivFab>
+            </DivFab> */}
         </div>
     );
 };

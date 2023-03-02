@@ -3,6 +3,7 @@ import styled from "styled-components";
 
 import { useAppSelector, useAppDispatch } from '../app/hooks';
 import { select } from "../app/slices/selections";
+import ImageActionButtons from "./ImageActionButtons";
 
 const ImgPreview = styled.img`
   position: relative;
@@ -12,14 +13,7 @@ const ImgPreview = styled.img`
   background: #a70f11;
 `;
 
-type ImageProps = {
-    rowNumber: number;
-    id: number;
-    url: string,
-};
-
-
-const ImagesItem = (props : ImageProps) => {
+const ImageItem = (props : ImageItemProps) => {
     const dispatch = useAppDispatch();
     const selections = useAppSelector(state => state.selections).rows.find((selectionInRow) => selectionInRow.row == props.rowNumber);
 
@@ -29,8 +23,20 @@ const ImagesItem = (props : ImageProps) => {
     return (
         <div>
             <ImgPreview src={props.url} onClick={handleImgClick} />
+            {selections && selections.idList.length == 1 && selections.idList[0] == props.id ?
+                <ImageActionButtons onEdit={props.onEdit} onRemove={props.onRemove} onChangeFiles={props.onChangeFiles} />
+                : ''
+            }
         </div>
     );
 };
 
-export default ImagesItem;
+export interface ImageItemProps {
+    rowNumber: number;
+    id: number;
+    url: string,
+    onEdit: ()=>void;
+    onRemove: ()=>void;
+    onChangeFiles: (e: any) => void;
+};
+export default ImageItem;

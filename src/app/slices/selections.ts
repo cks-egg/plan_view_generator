@@ -1,9 +1,9 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit'
 
-type SelectionInRow = {
-    row: number
-    idList: number[]
-};
+// type SelectionInRow = {
+//     row: number
+//     idList: number[]
+// };
 
 type RowNId = {
     row: number,
@@ -40,5 +40,9 @@ export const selectSlice = createSlice({
     }
 });
 
+export interface SelectionInRow {
+    row: number
+    idList: number[]
+}
 export const { select, clear } = selectSlice.actions
 export default selectSlice.reducer

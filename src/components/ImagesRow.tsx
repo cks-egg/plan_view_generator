@@ -8,7 +8,7 @@ import styled from "styled-components";
 import ImageItem from "./ImageItem";
 import ImageAppender from "./ImageAppender";
 import { useAppSelector, useAppDispatch } from '../app/hooks';
-import { clear } from "../app/slices/selections";
+import { clear, select } from "../app/slices/selections";
 
 const DivFlex = styled.div`
   display: flex;
@@ -40,6 +40,7 @@ const ImageRow = (props : RowProps) => {
         (e: ChangeEvent<HTMLInputElement> | any): void => {
             let selectFiles: File[] = [];
             let tempFiles: ImageFile[] = files;
+            let fileUploadId = e.target.id;
 
             if (e.type === "drop") {
                 selectFiles = e.dataTransfer.files;
@@ -47,16 +48,29 @@ const ImageRow = (props : RowProps) => {
                 selectFiles = e.target.files;
             }
 
-            for (const file of selectFiles) {
-                tempFiles = [
-                    ...tempFiles,
-                    {id: fileId.current++, file: file, url: URL.createObjectURL(file) }
-                ];
-            }
+            if(fileUploadId === 'fileUpload'){
+                for (const file of selectFiles) {
+                    tempFiles = [
+                        ...tempFiles,
+                        {id: fileId.current++, file: file, url: URL.createObjectURL(file) }
+                    ];
+                }
+                setFiles(tempFiles);
 
-            setFiles(tempFiles);
+            } else if(fileUploadId === 'editFileUpload'){
+                let tempFileId = selections!.idList[0];
+                let filesIdx = files.findIndex((x) => x.id === tempFileId);
+
+                setFiles(files.filter((curFile: ImageFile) => selections!.idList.indexOf(curFile.id) < 0));
+                dispatch(clear(props.rowNumber));
+
+                tempFiles[filesIdx] = {id: fileId.current++, file: selectFiles[0], url: URL.createObjectURL(selectFiles[0]) };
+                setFiles(tempFiles);
+                dispatch(select({row: props.rowNumber, id:tempFiles[filesIdx].id}));
+            }
+            
         },
-        [files]
+        [selections, files]
     );
 
     const handleRemoveFiles = useCallback(
@@ -71,7 +85,7 @@ const ImageRow = (props : RowProps) => {
 
     const handleEditFile = useCallback(
         (): void => {
-            alert('edit!');
+            
         },
         [files]
     );
@@ -95,7 +109,7 @@ const ImageRow = (props : RowProps) => {
         <DivFlex>
             {files.length > 0 && files.map((file: ImageFile) => {
                 return (
-                    <ImageItem rowNumber={props.rowNumber} key={file.id} id={file.id} url={file.url}/>
+                    <ImageItem rowNumber={props.rowNumber} key={file.id} id={file.id} url={file.url} onRemove={handleRemoveFiles} onEdit={handleEditFile} onChangeFiles={onChangeFiles}/>
                 );
             })}
             <ImageAppender rowNumber={props.rowNumber} onChangeFiles={onChangeFiles} onRemove={handleRemoveFiles} onEdit={handleEditFile} />
