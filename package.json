@@ -25,7 +25,9 @@
     "redux": "latest",
     "@reduxjs/toolkit": "latest",
     "react-redux": "latest",
-    "@types/react-redux": "latest"
+    "@types/react-redux": "latest",
+    "@apollo/client": "latest",
+    "graphql": "latest"
   },
   "scripts": {
     "start": "react-scripts start",
