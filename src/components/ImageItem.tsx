@@ -1,14 +1,14 @@
-import React from "react";
-import styled from "styled-components";
+import React from 'react';
+import styled from 'styled-components';
 
 import { useAppSelector, useAppDispatch } from '../app/hooks';
-import { select } from "../app/slices/selections";
+import { select } from '../app/slices/selections';
 
 const ImgPreview = styled.img`
   position: relative;
   left: 50%;
   transform: translateX(-50%);
-  width: 100%;  
+  width: 100%;
   background: #a70f11;
 `;
 
